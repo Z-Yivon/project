@@ -9,9 +9,6 @@ Rho攻击（来自Pollard Rho算法），流程如下
 对应的示意图如下  
 ![image](https://github.com/Z-Yivon/project/blob/main/project2/headImg.png)  
 
-## 代码说明
-在Rho_for_SM3.c中，利用openssl密码库，分别实现了一次SM3哈希函数hash_str()和两次SM3哈希函数hashhash_str()
-
 ## 运行环境
 visual studio 2019
 
