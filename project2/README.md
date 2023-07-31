@@ -14,7 +14,6 @@ visual studio 2019
 
 需要提前安装openssl库，安装方法可以参考以下网址：https://blog.csdn.net/zhizhengguan/article/details/112846817
 ## 运行结果
-<font size="1">The above data vary greatly with the change of the initial value.</font><br />  
 16比特运行结果截图
 
 ![image](https://github.com/Z-Yivon/project/blob/main/project2/8bit.png)
