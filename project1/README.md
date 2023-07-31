@@ -72,6 +72,9 @@
 ## 运行结果
 已经包含在项目的文件夹中。
 
+![img](https://github.com/Z-Yivon/project/blob/main/project1/16bit.png)
+
+![img](https://github.com/Z-Yivon/project/blob/main/project1/24bit.png)
 
 
 
