@@ -18,6 +18,9 @@ visual studio 2019
 ## 运行结果
 <font size="1">The above data vary greatly with the change of the initial value.</font><br />  
 16比特运行结果截图
+
 ![image](https://github.com/Z-Yivon/project/blob/main/project2/8bit.png)
+
 24比特运行结果截图
+
 ![image](https://github.com/Z-Yivon/project/blob/main/project2/24bit.png)
