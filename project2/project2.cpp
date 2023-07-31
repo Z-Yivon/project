@@ -1,143 +1,133 @@
-锘縠xtern "C"
-{
-#include <openssl/applink.c>
-};
 #include <stdio.h>
-#include <openssl/evp.h>
-#include <openssl/bio.h>
+#include <string.h>
+#include<openssl/evp.h>
+#include<string.h>
 #include<time.h>
-#include<iostream>
-#include<random>
-#define lenth 3//锟斤拷锟斤拷锟斤拷锟斤拷(3*8bits)
-unsigned char* sm3(unsigned char* msg)
-{
-    EVP_MD_CTX* ctx = NULL;
-    EVP_MD* SM3 = NULL;
-    unsigned int len = 0;
-    unsigned char* outdigest = NULL;
-    unsigned char* ret = (unsigned char*)malloc(32 * sizeof(unsigned char*));
-    /* Create a context for the digest operation */
-    ctx = EVP_MD_CTX_new();
-    if (ctx == NULL)
-        goto err;
-    SM3 = EVP_MD_fetch(NULL, "SM3", NULL);
-    if (SM3 == NULL)
-        goto err;
-    if (!EVP_DigestInit_ex(ctx, SM3, NULL))
-        goto err;
-    if (!EVP_DigestUpdate(ctx, msg, sizeof(msg)))
-        goto err;
-    outdigest = (unsigned char*)OPENSSL_malloc(EVP_MD_get_size(SM3));
-    if (outdigest == NULL)
-        goto err;
-    if (!EVP_DigestFinal_ex(ctx, outdigest, &len))
-        goto err;
-    for (int i = 0; i < 32; i++)
-    {
-        ret[i] = outdigest[i];
-    }
 
-err:
-    EVP_MD_free(SM3);
-    EVP_MD_CTX_free(ctx);
-    OPENSSL_free(outdigest);
-    //std::cout << "error";
+
+/**
+ * @brief 计算一段数据的哈希值（原始、截断）
+ *
+ * @param str 数据
+ * @param len 数据长度
+ * @param hash_result 哈希值
+ * @return unsigned int 原始哈希值长度
+ */
+unsigned int SM3_hash(unsigned char* str, const size_t len, unsigned char* hash_result)
+{
+    unsigned int ret;
+    const EVP_MD* alg = EVP_sm3();
+    EVP_Digest(str, len, hash_result, &ret, alg, NULL);
     return ret;
 }
-void birthday_attack()
+
+unsigned int SM3_hash_hash(unsigned char* str, const size_t len, unsigned char* hash_result)
 {
-    int count = 0;
-    unsigned char m[10000] = "12332134124";
-    unsigned char* temp_, * temp;
-    unsigned char* temp1;
-    unsigned char btemp[32], btemp1[32];
-    unsigned char* tush;
-    //const unsigned char r[] = "123";
-    EVP_MD* SM3 = NULL;
-    temp = (unsigned char*)malloc(32 * sizeof(unsigned char));
-    temp_ = sm3(m);
-    temp1 = (unsigned char*)malloc(32 * sizeof(unsigned char));
-    memcpy(temp1, temp_, lenth);
-    memcpy(temp, temp_, lenth);
-    while (++count) {
-        int f = 0;
-        memcpy(btemp, temp, lenth);
-        memcpy(temp, tush = sm3(btemp), 32);
-        free(tush);
-        memcpy(btemp, temp, lenth);
-        memcpy(temp, tush = sm3(btemp), 32);
-        free(tush);
-        memcpy(btemp1, temp1, lenth);
-        memcpy(temp1, tush = sm3(btemp1), 32);
-        free(tush);
-        for (int i = 0; i < lenth; i++)
-        {
-            if (temp[i] != temp1[i]) goto flag;
-        }
-        for (int i = 0; i < lenth; i++)
-        {
-            if (btemp[i] == btemp1[i]);
-            else f = 1;
-        }
-        if (!f) {
-            int a, b;
-            a = rand() % 11;
-            b = rand() % 64;
-            m[a] = b;
-            temp_ = sm3(m);
-            memcpy(temp1, temp_, lenth);
-            memcpy(temp, temp_, lenth);
-            goto flag;
-        }
-        printf("%dbits sm3\n", lenth * 8);
-        for (int i = 0; i < 32; i++)
-        {
-            printf("%02hx", btemp[i]);
-        }
-        printf("\n");
-        for (int i = 0; i < 32; i++)
-        {
-            printf("%02hx", temp[i]);
-        }
-        printf("\n");
-        for (int i = 0; i < 32; i++)
-        {
-            printf("%02hx", btemp1[i]);
-        }
-        printf("\n");
-        for (int i = 0; i < 32; i++)
-        {
-            printf("%02hx", temp1[i]);
-        }
-        printf("\n");
-        printf("%d", count);
-
-        break;
-    flag:
-        {
-            //free(btemp);
-            //free(btemp1);
-            continue;
-
-        }
-
-    }
+    unsigned int ret1, ret2;
+    const EVP_MD* alg = EVP_sm3();
+    unsigned char middle[32];
+    EVP_Digest(str, len, (unsigned char*)middle, &ret1, alg, NULL);
+    EVP_Digest(middle, ret1, hash_result, &ret2, alg, NULL);
+    return ret2;
 }
-void  benchsm3()
+
+/**
+ * @brief 生成随机字符串
+ * @param length 产生字符串的长度
+ * @return char* 随机字符串
+ */
+unsigned char* strRand(int length)
 {
-    time_t sta, end;
-    unsigned char  m[] = "12223";
-    sta = clock();
-    for (int i = 0; i < 1000000; i++)
+    int tmp;							// tmp: 暂存一个随机数
+    unsigned char* buffer;						// buffer: 保存返回值
+    buffer = (unsigned char*)malloc(sizeof(unsigned char) * length);
+
+    srand((unsigned)time(NULL));
+    for (int i = 0; i < length; i++) {
+        tmp = rand() % 62;	        // 随机一个小于 62 的整数，0-9、a-z、A-Z 共 62 种字符
+        if (tmp < 10) {			// 如果随机数小于 10，变换成一个阿拉伯数字的 ASCII
+            tmp += '0';
+        }
+        else if (tmp < 36) {
+            tmp -= 10;
+            tmp += 'a';
+        }
+        else {				// 否则，变换成一个大写字母的 ASCII
+            tmp -= 36;
+            tmp += 'A';
+        }
+        buffer[i] = tmp;
+    }
+    return buffer;
+}
+
+
+int main(int argc, char const* argv[])
+{
+    int HASH_RESULT_LEN = 32;  //原始hash长度 32*8=256bits
+    int HASH_ATTCK_LEN = 3;   // 截断后的长度为3x8bits（原hash结果的前4位）
+    srand((unsigned)time(NULL));
+    int length = rand() % 100;
+    unsigned char* sr = strRand(length);        // 生成随机字符串sr
+/**
+ * 符号定义
+ * H1 = Hash(sr), H1_ = H1
+ * H1 = hash(H1), H1_ = hash(hash(H1_))
+ */
+    unsigned char H1[32];
+    SM3_hash(sr, strlen((char*)sr), H1);      // H1 = Hash(sr)
+    unsigned char H1_[32];
+    memcpy(H1_, (char*)H1, HASH_RESULT_LEN);     // H1_ = H1
+
+
+    SM3_hash(H1, HASH_RESULT_LEN, H1);     // H1 = hash(H1)
+    SM3_hash_hash(H1_, HASH_RESULT_LEN, H1_);     // H1_ = hash(hash(H1_))
+
+    clock_t start = clock();
+    unsigned char a[32];     // 记录产生碰撞的字符串
+    unsigned char b[32];
+    while (memcmp(H1, H1_, HASH_ATTCK_LEN))    // 找到碰撞，终止循环
     {
-
-        sm3(m);
+        memcpy(a, H1, HASH_RESULT_LEN);
+        memcpy(b, (char*)H1_, HASH_RESULT_LEN);
+        SM3_hash(H1, HASH_RESULT_LEN, H1);     // H1 = hash(H1)
+        SM3_hash_hash(H1_, HASH_RESULT_LEN, H1_);     // H1_ = hash(hash(H1_))
     }
-    end = clock();
-    std::cout << double(end - sta) / CLOCKS_PER_SEC << "s" << std::endl;
-}
-int main(void)
-{
-    birthday_attack();
-    //benchsm3();
+    clock_t end = clock();
+
+    printf("Find the collision!(%d bits)\n", HASH_ATTCK_LEN * 8);
+
+    /*      print collision      */
+
+    printf("Initial string:%s\n", sr);
+    printf("a(in hex) = ");
+    for (int i = 0; i < HASH_RESULT_LEN; i++) {
+        printf("%02x", a[i]);
+    }
+    printf("\n");
+
+    printf("b(in hex) = ");
+    for (int i = 0; i < HASH_RESULT_LEN; i++) {
+        printf("%02x", b[i]);
+    }
+    printf("\nhash(b)(in hex) = ");
+
+    SM3_hash(b, HASH_RESULT_LEN, b);
+    for (int i = 0; i < HASH_RESULT_LEN; i++) {
+        printf("%02x", b[i]);
+    }
+    printf("\nH1 = hash(a) = ");
+
+    for (int i = 0; i < HASH_RESULT_LEN; i++) {
+        printf("%02x", H1[i]);
+    }
+    printf("\n");
+
+    printf("H1_ = hash(hash(b)) = ");
+    for (int i = 0; i < HASH_RESULT_LEN; i++) {
+        printf("%02x", H1_[i]);
+    }
+
+    printf("\nRunning time = %f seconds\n", (double)(end - start) / CLOCKS_PER_SEC);
+    return 0;
 }
