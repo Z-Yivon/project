@@ -1,5 +1,5 @@
-#project1
-##Birthday attack原理
+# project1
+## Birthday attack原理
 ## 什么是生日攻击
 
 ​		这个问题在数学上早有原型，叫做"[生日问题](https://en.wikipedia.org/wiki/Birthday_problem)"（birthday problem）：一个班级需要有多少人，才能保证每个同学的生日都不一样？
@@ -69,9 +69,12 @@
 
 使用visual studio 2019运行得到结果
 
-##运行结果
+## 运行结果
 已经包含在项目的文件夹中。
 
+![img](https://github.com/Z-Yivon/project/blob/main/project1/16bit.png)
+
+![img](https://github.com/Z-Yivon/project/blob/main/project1/24bit.png)
 
 
 
