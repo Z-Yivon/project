@@ -48,7 +48,7 @@ SM3的迭代压缩步骤没有直接使用数据分组进行运算，而是使�
 
 ## 运行环境：
 
-** visual studio 2019 
+**visual studio 2019 
 
 ## 运行结果
 ![img](https://github.com/Z-Yivon/project/blob/main/project3/%E8%BF%90%E8%A1%8C%E7%BB%93%E6%9E%9C.png)  
