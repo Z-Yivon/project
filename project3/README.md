@@ -20,13 +20,13 @@ SM3的消息扩展步骤是以512位的数据分组作为输入的。因此，�
 <img src="https://pic3.zhimg.com/v2-366d5284c75a6ac92fdbc12ce5b45a2a_r.jpg" style="zoom:60%;" />
 
 ### 迭代过程
-将填充后的消息m′按512比特进行分组：$m′= B^{(0)}B^{(1)} ···B^{(n−1)}$
-其中$ n=(l+k+65)/512 $
+将填充后的消息m′按512比特进行分组：m′= B^{(0)}B^{(1)} ···B^{(n−1)}
+其中 n=(l+k+65)/512 
 对m′按下列方式迭代：
 
 ```python
 FOR i=0 TO n-1
-$$V^{(i+1)} = CF(V^{(i)}, B^{(i)})$$
+V^{(i+1)} = CF(V^{(i)}, B^{(i)})
 END FOR
 ```
 其中CF是压缩函数，$V^{(0)}$为256比特初始值IV，$B^{(i)}$为填充后的消息分组，迭代压缩的结果为$V ^{(n)}$
@@ -54,7 +54,7 @@ $ ./sm3
 ```
 
 ## 运行结果
-![](https://github.com/fyl01/course-project/blob/main/Project%203:length%20extension%20attack/result.png)  
+![img](https://github.com/Z-Yivon/project/blob/main/project3/%E8%BF%90%E8%A1%8C%E7%BB%93%E6%9E%9C.png)  
 可以看到第二次的哈希值和第三次构造的字符串的哈希值相同，攻击成功。
 
 ## 参考资料
