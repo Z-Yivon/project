@@ -16,7 +16,7 @@ visual studio 2019
 ## 运行结果
 16比特运行结果截图
 
-![image](https://github.com/Z-Yivon/project/blob/main/project2/8bit.png)
+![image](https://github.com/Z-Yivon/project/blob/main/project2/16bit.png)
 
 24比特运行结果截图
 
