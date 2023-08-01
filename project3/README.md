@@ -46,7 +46,9 @@ SM3的迭代压缩步骤没有直接使用数据分组进行运算，而是使�
 2.	生成一个附加消息(m')。首先用hash1推算出这一次加密结束后8个向量的值，再以它们作为初始向量，去加密m’，得到另一个hash值(hash2)
 3.	计算secret + padding + m'的hash值(hash3)，如果攻击成功，hash2应该和hash3相等  
 
-## 运行环境：** visual studio 2019 
+## 运行环境：
+
+** visual studio 2019 
 
 ## 运行结果
 ![img](https://github.com/Z-Yivon/project/blob/main/project3/%E8%BF%90%E8%A1%8C%E7%BB%93%E6%9E%9C.png)  
