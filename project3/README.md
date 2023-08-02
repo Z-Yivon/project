@@ -17,7 +17,7 @@ SM3的消息扩展步骤是以512位的数据分组作为输入的。因此，�
 
 填充完的数据大概长这样：  
 
-<img src="https://pic3.zhimg.com/v2-366d5284c75a6ac92fdbc12ce5b45a2a_r.jpg" style="zoom:60%;" />
+<img src="https://github.com/Z-Yivon/project/blob/main/project3/picture.jpg" style="zoom:60%;" />
 
 ### 迭代过程
 将填充后的消息m′按512比特进行分组：m′= B^{(0)}B^{(1)} ···B^{(n−1)}
