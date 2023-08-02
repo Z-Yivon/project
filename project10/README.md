@@ -10,7 +10,7 @@ python 3.10 需要提前安装相应的库。
 
 ## 运行结果
 
-![img]([pic/3.png](https://github.com/Z-Yivon/project/blob/main/project10/result.png))
+![img](https://github.com/Z-Yivon/project/blob/main/project10/result.png))
 
 ## 参考资料
 
