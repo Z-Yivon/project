@@ -1,4 +1,4 @@
-# Application of this deduce technique in Ethereum with ECDSA
+# project10
 
 
 #### 前置知识
@@ -107,3 +107,7 @@ def deduce_pubkey(s, r, k, G):
 ## 运行结果
 
 ![](pic/3.png)
+
+### 参考资料
+
+[第七章 交易 - 签名前缀值（v）和公钥恢复 - 《精通以太坊 （中文版）》 - 书栈网 · BookStack](https://www.bookstack.cn/read/ethereum_book-zh/spilt.9.ee4988229e1934ea.md
