@@ -3,9 +3,8 @@
 
 ## 实验环境
 
-python 3.10 需要提前安装hashlib、hmac、re、random库
+python 3.10 需要提前安装hashlib、hmac、sys、gmssl库
 
-把RFC6979.py和project11.py放在同一路径下，运行project11.py即可。
 
 ## RFC6979
 
@@ -123,92 +122,28 @@ Given the input message m, the following process is applied:
    would induce biases that would be detrimental to signature security.
 ```
 
-根据此文档，使用python，通过hmac，hashlib等库函数实现k的生成部分。参考资料实现了轻量化的椭圆曲线库Curve实现sm2的计算，并应用于后续项目。最终实现了签名值的生成并检查了验证的正确性。
+根据此文档，使用python，通过hmac，hashlib等库函数实现k的生成部分。
 
 参考文档内容，编写生成k的函数：
 
 ```python
-def deterministic_generate_k(msghash, sk):
+def deterministic_generate_k(msghash, priv):
     v = b'\x01' * 32
     k = b'\x00' * 32
-
-    sk = encode_privkey(sk, 'bin')
-
-    msghash = encode(hash_to_int(msghash), 256, 32)
-
-    # K = HMAC_K（V || 0x00 || int2octets（x）|| bits2octets（h1））
-    k = hmac.new(k, v + b'\x00' + sk + msghash, hashlib.sha256).digest()
-    # V = HMAC_K（V）
+    k = hmac.new(k, v+b'\x00'+priv+msghash, hashlib.sha256).digest()
     v = hmac.new(k, v, hashlib.sha256).digest()
-    # K = HMAC_K（V || 0x01 || int2octets（x）|| bits2octets（h1））
-    k = hmac.new(k, v + b'\x01' + sk + msghash, hashlib.sha256).digest()
-    # V = HMAC_K（V）
+    k = hmac.new(k, v+b'\x01'+priv+msghash, hashlib.sha256).digest()
     v = hmac.new(k, v, hashlib.sha256).digest()
-
-    # 若结果不在[1,q-1]范围中，则重复迭代
-    while True:
-        v = hmac.new(k, v, hashlib.sha256).digest()
-        T = v
-        res = decode(T, 256)
-        if 1 <= decode(T, 256) <= q - 1:
-            return res
-        k = hmac.new(k, v + b'\x00', hashlib.sha256).digest()
-        v = hmac.new(k, v, hashlib.sha256).digest()
+    return bytes_to_int(hmac.new(k, v, hashlib.sha256).digest())
 ```
 
 ------
 
 得到k后，正常的构建sm2签名体系。
 
-![./algorithm.png](https://github.com/Z-Yivon/project/blob/main/project11/algorithm.png))
-
-算法流程参考上图：
-
-```python
-def sign(msg, ID_str, d_A):
-    Z_A = encode(ENTL, 16) + ID_str + encode(a, 16) + encode(b, 16) + encode(x_G, 16) + encode(y_G, 16) + encode(P_A.x,
-                                                                                                                 16) + encode(
-        P_A.y, 16)
-    Z_A = hashlib.sha256(Z_A.encode()).hexdigest()
-    M = Z_A + encode(decode(msg, 256), 16)
-    e = decode(hashlib.sha256(M.encode()).hexdigest(), 16)
-    kG = k * G
-    r = (e + kG.x) % n
-    s = (inv_mod(1 + d_A, n) * (k - r * d_A)) % n
-    return r, s
-
-
-def verify(msg, r, s, ID_str):
-    Z_A = encode(ENTL, 16) + ID_str + encode(a, 16) + encode(b, 16) + encode(x_G, 16) + encode(y_G, 16) + encode(P_A.x,
-                                                                                                                 16) + encode(
-        P_A.y, 16)
-    Z_A = hashlib.sha256(Z_A.encode()).hexdigest()
-    M = Z_A + encode(decode(msg, 256), 16)
-    e = decode(hashlib.sha256(M.encode()).hexdigest(), 16)
-    t = (r + s) % n
-    pt = s * G + t * P_A
-    R = (e + pt.x) % n
-    return R == r
-```
-
-使用的参数为：
-
-```python
-q = 0x8542D69E4C044F18E8B92435BF6FF7DE457283915C45517D722EDB8B08F1DFC3
-a = 0x787968B4FA32C3FD2417842E73BBFEFF2F3C848B6831D7E0EC65228B3937E498
-b = 0x63E4C6D3B23B0C849CF84241484BFE48F61D59A5B16BA06E6E12D1DA27C5249A
-x_G = 0x421DEBD61B62EAB6746434EBC3CC315E32220B3BADD50BDC4C4E6C147FEDD43D
-y_G = 0x0680512BCBB42C07D47349D2153B70C4E5D7FDFCBFA36EA1A85841B9E46E09A2
-n = 0x8542D69E4C044F18E8B92435BF6FF7DD297720630485628D5AE74EE7C32E79B7
-```
-
-随机生成$d_A \in [2,q-1]$作为私钥，$P=d_A\cdot G$生成一条签名并进行签名验证。
+使用gmssl库中的sm2相关函数实现sm2的相关功能。并进行了加解密操作，验证了加解密的一致性，以及签名的正确性。
 
 ## 运行结果
-
-最终签名及验证结果见下图：
-
-其中从上到下每行的意义是：私钥，生成的k，原始消息，签名值r，签名值s，验证结果。
 
 ![img](https://github.com/Z-Yivon/project/blob/main/project11/result.png)
 
