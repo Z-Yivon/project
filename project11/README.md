@@ -1,6 +1,5 @@
 # Project11: impl sm2 with RFC6979
 
-注：使用test.py测试本代码需要安装gmssl库（可恶github和typora上显示的居然不一样，凑合看吧）,testsm2.py则不用
 
 ## 实验环境
 
