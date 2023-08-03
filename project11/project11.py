@@ -1,197 +1,291 @@
-from random import randint
-import math
+import hashlib
+import hmac
+import re
+import random
+from RFC6979 import Point, CurveFp, inverse
 
-def modinv(a,m):
-    x1,x2,x3=1,0,a
-    y1,y2,y3=0,1,m
-    while y3!=0:
-        q=x3//y3
-        t1,t2,t3=x1-q*y1,x2-q*y2,x3-q*y3
-        x1,x2,x3=y1,y2,y3
-        y1,y2,y3=t1,t2,t3
-    return x1%m
+#参数设置
+q = 0x8542D69E4C044F18E8B92435BF6FF7DE457283915C45517D722EDB8B08F1DFC3
+a = 0x787968B4FA32C3FD2417842E73BBFEFF2F3C848B6831D7E0EC65228B3937E498
+b = 0x63E4C6D3B23B0C849CF84241484BFE48F61D59A5B16BA06E6E12D1DA27C5249A
+x_G = 0x421DEBD61B62EAB6746434EBC3CC315E32220B3BADD50BDC4C4E6C147FEDD43D
+y_G = 0x0680512BCBB42C07D47349D2153B70C4E5D7FDFCBFA36EA1A85841B9E46E09A2
+n = 0x8542D69E4C044F18E8B92435BF6FF7DD297720630485628D5AE74EE7C32E79B7
 
-iv='7380166f4914b2b9172442d7da8a0600a96f30bc163138aae38dee4db0fb0e4e'
-def t(j):
-    if j<16:
-        return 0x79cc4519
-    return 0x7a879d8a
-def csl(x,k):#cycle_shift_left
-    x='{:032b}'.format(x)
-    k=k%32
-    x=x[k:]+x[:k]
-    return int(x,2)
-#bool function
-def ff(x,y,z,j):
-    if j<16:
-        return x^y^z
-    return (x&y)|(y&z)|(z&x)
-def gg(x,y,z,j):
-    if j<16:
-        return x^y^z
-    return (x&y)|(~x&z)
+#明文消息
+msg = b'202100460108'
 
-#displace function
-def p0(x):
-    return x^csl(x, 9)^csl(x, 17)
-def p1(x):
-    return x^csl(x, 15)^csl(x, 23)
+string_types = (str)
+string_or_bytes_types = (str, bytes)
+int_types = (int, float)
 
-#plaintext:m(length<2^64bit)
-def fill(m):
-    l=len(m)*4
-    m=m+'8'
-    k=112-(len(m)%128)
-    m=m+'0'*k+'{:016x}'.format(l)
-    return m
+# 方便处理字符串与数字转换
+code_strings = {
+    2: '01',
+    10: '0123456789',
+    16: '0123456789abcdef',
+    32: 'abcdefghijklmnopqrstuvwxyz234567',
+    58: '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz',
+    256: ''.join([chr(x) for x in range(256)])
+}
 
-def grouping(m):
-    n=len(m)//128
-    b=[]
-    for i in range(n):
-        b.append(m[i*128:(i+1)*128])
+#最大公因子
+def gcd(a, b):
+    k = a // b
+    remainder = a % b
+    while remainder != 0:
+        a = b
+        b = remainder
+        k = a // b
+        remainder = a % b
     return b
 
-def extend(bi):
-    w=[]
-    for i in range(16):
-        w.append(int(bi[i*8:(i+1)*8],16))
-    for j in range(16,68):
-        w.append(p1(w[j-16]^w[j-9]^csl(w[j-3], 15))^csl(w[j-13], 7)^w[j-6])
-    for j in range(68,132):
-        w.append(w[j-68]^w[j-64])
-    return w
+# 返回数据hash值
+def Hash(string):
+    binary_data = string if isinstance(string, bytes) else bytes(string, 'utf-8')
+    return hashlib.sha256(binary_data).digest()
 
-def cf(vi,bi):
-    w=extend(bi)
-    a,b,c,d,e,f,g,h=int(vi[0:8],16),int(vi[8:16],16),int(vi[16:24],16),int(vi[24:32],16),int(vi[32:40],16),int(vi[40:48],16),int(vi[48:56],16),int(vi[56:64],16)
-    for j in range(64):
-        ss1=csl((csl(a,12)+e+csl(t(j),j))%pow(2,32),7)
-        ss2=ss1^csl(a,12)
-        tt1=(ff(a,b,c,j)+d+ss2+w[j+68])%pow(2,32)
-        tt2=(gg(e,f,g,j)+h+ss1+w[j])%pow(2,32)
-        d=c
-        c=csl(b,9)
-        b=a
-        a=tt1
-        h=g
-        g=csl(f,19)
-        f=e
-        e=p0(tt2)
-    abcdefgh=int('{:08x}'.format(a)+'{:08x}'.format(b)+'{:08x}'.format(c)+'{:08x}'.format(d)+'{:08x}'.format(e)+'{:08x}'.format(f)+'{:08x}'.format(g)+'{:08x}'.format(h),16)
-    return '{:064x}'.format(abcdefgh^int(vi,16))
 
-def iteration(b):
-    n=len(b)
-    v=iv
-    for i in range(n):
-        v=cf(v,b[i])
-    return v
-
-def sm3hash(m):
-    m=fill(m)
-    b=grouping(m)
-    return iteration(b)
-
-def addition(x1,y1,x2,y2,a,p):
-    if x1==x2 and y1==p-y2:
-        return False
-    if x1!=x2:
-        lamda=((y2-y1)*modinv(x2-x1, p))%p
+def get_code_string(base):
+    if base in code_strings:
+        return code_strings[base]
     else:
-        lamda=(((3*x1*x1+a)%p)*modinv(2*y1, p))%p
-    x3=(lamda*lamda-x1-x2)%p
-    y3=(lamda*(x1-x3)-y1)%p
-    return x3,y3
+        raise ValueError("Invalid base!")
 
-def mutipoint(x,y,k,a,p):
-    k=bin(k)[2:]
-    qx,qy=x,y
-    for i in range(1,len(k)):
-        qx,qy=addition(qx, qy, qx, qy, a, p)
-        if k[i]=='1':
-            qx,qy=addition(qx, qy, x, y, a, p)
-    return qx,qy
 
-def kdf(z,klen):
-    ct=1
-    k=''
-    for _ in range(math.ceil(klen/256)):
-        k=k+sm3hash(hex(int(z+'{:032b}'.format(ct),2))[2:])
-        ct=ct+1
-    k='0'*((256-(len(bin(int(k,16))[2:])%256))%256)+bin(int(k,16))[2:]
-    return k[:klen]
+# 按照base进制编码 数字->字符
+def encode(val, base, minlen=0):
+    base, minlen = int(base), int(minlen)
+    code_string = get_code_string(base)
+    result_bytes = bytes()
+    while val > 0:
+        curcode = code_string[val % base]
+        result_bytes = bytes([ord(curcode)]) + result_bytes
+        val //= base
 
-#parameters
-p=0x8542D69E4C044F18E8B92435BF6FF7DE457283915C45517D722EDB8B08F1DFC3
-a=0x787968B4FA32C3FD2417842E73BBFEFF2F3C848B6831D7E0EC65228B3937E498
-b=0x63E4C6D3B23B0C849CF84241484BFE48F61D59A5B16BA06E6E12D1DA27C5249A
-gx=0x421DEBD61B62EAB6746434EBC3CC315E32220B3BADD50BDC4C4E6C147FEDD43D
-gy=0x0680512BCBB42C07D47349D2153B70C4E5D7FDFCBFA36EA1A85841B9E46E09A2
-n=0x8542D69E4C044F18E8B92435BF6FF7DD297720630485628D5AE74EE7C32E79B7
-#测试待加密的消息M：hello,world
+    pad_size = minlen - len(result_bytes)
 
-dB=randint(1,n-1)
-xB,yB=mutipoint(gx,gy,dB,a,p)
+    padding_element = b'\x00' if base == 256 else b'1' \
+        if base == 58 else b'0'
+    if pad_size > 0:
+        result_bytes = padding_element * pad_size + result_bytes
 
-def encrypt(m:str):
-    plen=len(hex(p)[2:])
-    m='0'*((4-(len(bin(int(m.encode().hex(),16))[2:])%4))%4)+bin(int(m.encode().hex(),16))[2:]
-    klen=len(m)
-    while True:
-        k=randint(1, n)
-        while k==dB:
-            k=randint(1, n)
-        x2,y2=mutipoint(xB, yB, k, a, p)
-        x2,y2='{:0256b}'.format(x2),'{:0256b}'.format(y2)
-        t=kdf(x2+y2, klen)
-        if int(t,2)!=0:
+    result_string = ''.join([chr(y) for y in result_bytes])
+    result = result_bytes if base == 256 else result_string
+
+    return result
+
+
+# 同理 解码
+def decode(string, base):
+    if base == 256 and isinstance(string, str):
+        string = bytes(bytearray.fromhex(string))
+    base = int(base)
+    code_string = get_code_string(base)
+    result = 0
+    if base == 256:
+        def extract(d, cs):
+            return d
+    else:
+        def extract(d, cs):
+            return cs.find(d if isinstance(d, str) else chr(d))
+
+    if base == 16:
+        string = string.lower()
+    while len(string) > 0:
+        result *= base
+        result += extract(string[0], code_string)
+        string = string[1:]
+    return result
+
+
+# 将hash字符串转化成数字
+def hash_to_int(x):
+    if len(x) in [40, 64]:
+        return decode(x, 16)
+    return decode(x, 256)
+
+
+def from_int_to_byte(a):
+    return bytes([a])
+
+
+def from_string_to_bytes(a):
+    return a if isinstance(a, bytes) else bytes(a, 'utf-8')
+
+
+# 使用字符symbol将消息填充至length
+def padding(msg, symbol, length):
+    if len(msg) >= length:
+        return msg
+    return symbol * (length - len(msg)) + msg
+
+
+# 更换字符串进制 先解码成数字再编码
+def change_base(string, frm, to, minlen=0):
+    if frm == to:
+        return padding(string, get_code_string(frm)[0], minlen)
+    return encode(decode(string, frm), to, minlen)
+
+
+def bin_dbl_sha256(s):
+    bytes_to_hash = from_string_to_bytes(s)
+    return hashlib.sha256(hashlib.sha256(bytes_to_hash).digest()).digest()
+
+
+def b58check_to_bin(inp):
+    leadingzbytes = len(re.match('^1*', inp).group(0))
+    data = b'\x00' * leadingzbytes + change_base(inp, 58, 256)
+    assert bin_dbl_sha256(data[:-4])[:4] == data[-4:]
+    return data[1:-4]
+
+
+def bin_to_b58check(inp, magicbyte=0):
+    if magicbyte == 0:
+        inp = from_int_to_byte(0) + inp
+    while magicbyte > 0:
+        inp = from_int_to_byte(magicbyte % 256) + inp
+        magicbyte //= 256
+
+    leadingzbytes = 0
+    for x in inp:
+        if x != 0:
             break
-    x1,y1=mutipoint(gx, gy, k, a, p)
-    x1,y1=(plen-len(hex(x1)[2:]))*'0'+hex(x1)[2:],(plen-len(hex(y1)[2:]))*'0'+hex(y1)[2:]
-    c1='04'+x1+y1
-    c2=((klen//4)-len(hex(int(m,2)^int(t,2))[2:]))*'0'+hex(int(m,2)^int(t,2))[2:]
-    c3=sm3hash(hex(int(x2+m+y2,2))[2:])
-    return c1,c2,c3
+        leadingzbytes += 1
 
-def decrypt(c1,c2,c3,a,b,p):
-    c1=c1[2:]
-    x1,y1=int(c1[:len(c1)//2],16),int(c1[len(c1)//2:],16)
-    if pow(y1,2,p)!=(pow(x1,3,p)+a*x1+b)%p:
-        return False
-    x2,y2=mutipoint(x1, y1, dB, a, p)
-    x2,y2='{:0256b}'.format(x2),'{:0256b}'.format(y2)
-    klen=len(c2)*4
-    t=kdf(x2+y2, klen)
-    if int(t,2)==0:
-        return False
-    m='0'*(klen-len(bin(int(c2,16)^int(t,2))[2:]))+bin(int(c2,16)^int(t,2))[2:]
-    u=sm3hash(hex(int(x2+m+y2,2))[2:])
-    if u!=c3:
-        return False
-    return hex(int(m,2))[2:]
+    checksum = bin_dbl_sha256(inp)[:4]
+    return '1' * leadingzbytes + change_base(inp + checksum, 256, 58)
 
 
-m="hello,world"
-print(m)
-c1,c2,c3=encrypt(m)
-c=(c1+c2+c3).upper()
-print('\nciphertext:')
-for i in range(len(c)):
-    print(c[i*8:(i+1)*8],end=' ')
-print('\n\nplaintext:')
-'''
-输出密文C= C1∥C2∥C3:
-04036077 FD158485 42F27D48 5D911193 936160D1 8D518F47 0CF51733 521E4BD9 
-712DC1E8 C10549C5 757CCE6F C8E5F338 66C87CBF F16B3A16 C95430F8 D20AE2A0 
-C62CBF73 595B0857 CB36999A 4B0F30ED 2186CB22 36193CD9 B2015B47 AA9E2F04 
-6489372C BE1BFC01 BE24ADC1
-'''
-m1=decrypt(c1, c2, c3, a, b, p)
-if m1:
-    m1=str(bytes.fromhex(m1))
-    m1='\n'.join(m1[2:-1].split('\\n'))
-    print(m1)
-    print(m==m1)
-else:
-    print(False)
+# 获取私钥格式
+def get_privkey_format(priv):
+    if isinstance(priv, int_types):
+        return 'decimal'
+    elif len(priv) == 32:
+        return 'bin'
+    elif len(priv) == 33:
+        return 'bin_compressed'
+    elif len(priv) == 64:
+        return 'hex'
+    elif len(priv) == 66:
+        return 'hex_compressed'
+    else:
+        bin_p = b58check_to_bin(priv)
+        if len(bin_p) == 32:
+            return 'wif'
+        elif len(bin_p) == 33:
+            return 'wif_compressed'
+        else:
+            raise Exception("WIF does not represent privkey")
+
+
+def decode_privkey(priv, formt=None):
+    if not formt: formt = get_privkey_format(priv)
+    if formt == 'decimal':
+        return priv
+    elif formt == 'bin':
+        return decode(priv, 256)
+    elif formt == 'bin_compressed':
+        return decode(priv[:32], 256)
+    elif formt == 'hex':
+        return decode(priv, 16)
+    elif formt == 'hex_compressed':
+        return decode(priv[:64], 16)
+    elif formt == 'wif':
+        return decode(b58check_to_bin(priv), 256)
+    elif formt == 'wif_compressed':
+        return decode(b58check_to_bin(priv)[:32], 256)
+    else:
+        raise Exception("WIF does not represent privkey")
+
+
+def encode_privkey(priv, formt, vbyte=128):
+    if not isinstance(priv, int_types):
+        return encode_privkey(decode_privkey(priv), formt, vbyte)
+    if formt == 'decimal':
+        return priv
+    elif formt == 'bin':
+        return encode(priv, 256, 32)
+    elif formt == 'bin_compressed':
+        return encode(priv, 256, 32) + b'\x01'
+    elif formt == 'hex':
+        return encode(priv, 16, 64)
+    elif formt == 'hex_compressed':
+        return encode(priv, 16, 64) + '01'
+    elif formt == 'wif':
+        return bin_to_b58check(encode(priv, 256, 32), int(vbyte))
+    elif formt == 'wif_compressed':
+        return bin_to_b58check(encode(priv, 256, 32) + b'\x01', int(vbyte))
+    else:
+        raise Exception("Invalid format!")
+
+
+def deterministic_generate_k(msghash, sk):
+    v = b'\x01' * 32
+    k = b'\x00' * 32
+
+    sk = encode_privkey(sk, 'bin')
+
+    msghash = encode(hash_to_int(msghash), 256, 32)
+
+    # K = HMAC_K（V || 0x00 || int2octets（x）|| bits2octets（h1））
+    k = hmac.new(k, v + b'\x00' + sk + msghash, hashlib.sha256).digest()
+    # V = HMAC_K（V）
+    v = hmac.new(k, v, hashlib.sha256).digest()
+    # K = HMAC_K（V || 0x01 || int2octets（x）|| bits2octets（h1））
+    k = hmac.new(k, v + b'\x01' + sk + msghash, hashlib.sha256).digest()
+    # V = HMAC_K（V）
+    v = hmac.new(k, v, hashlib.sha256).digest()
+
+    while True:
+        v = hmac.new(k, v, hashlib.sha256).digest()
+        T = v
+        res = decode(T, 256)
+        if 1 <= decode(T, 256) <= q - 1:
+            return res
+        k = hmac.new(k, v + b'\x00', hashlib.sha256).digest()
+        v = hmac.new(k, v, hashlib.sha256).digest()
+
+# print(encode(ENTL,16))
+
+def sign(msg, ID_str, d_A):
+    Z_A = encode(ENTL, 16) + ID_str + encode(a, 16) + encode(b, 16) + encode(x_G, 16) + encode(y_G, 16) + encode(P_A.x,16) + encode(P_A.y, 16)
+    Z_A = hashlib.sha256(Z_A.encode()).hexdigest()
+    M = Z_A + encode(decode(msg, 256), 16)
+    e = decode(hashlib.sha256(M.encode()).hexdigest(), 16)
+    kG = k * G
+    r = (e + kG.x) % n
+    s = (inverse(1 + d_A, n) * (k - r * d_A)) % n
+    return r, s
+
+
+def verify(msg, r, s, ID_str):
+    Z_A = encode(ENTL, 16) + ID_str + encode(a, 16) + encode(b, 16) + encode(x_G, 16) + encode(y_G, 16) + encode(P_A.x,16) + encode(P_A.y, 16)
+    Z_A = hashlib.sha256(Z_A.encode()).hexdigest()
+    M = Z_A + encode(decode(msg, 256), 16)
+    e = decode(hashlib.sha256(M.encode()).hexdigest(), 16)
+    t = (r + s) % n
+    pt = s * G + t * P_A
+    R = (e + pt.x) % n
+    return R == r
+
+
+d_A = random.randint(2, n - 1)
+k = deterministic_generate_k(Hash(str(msg)), encode(d_A, 256, 32))
+
+ID = b'202100460108'
+ID_str = '202100460108'
+E = CurveFp(q, a, b)
+G = Point(E, x_G, y_G)
+
+while gcd(d_A, n) != 1:
+    d_A = random.randint(2, n - 1)
+P_A = d_A * G
+ENTL = len(encode(decode(ID, 256), 2))
+
+r, s = sign(msg, ID_str, d_A)
+print("private_key:", hex(d_A), sep='')
+print("k=", hex(k), sep='')
+print('message:', msg)
+print(hex(r), hex(s), sep='\n')
+print('verify:', verify(msg, r, s, ID_str))
