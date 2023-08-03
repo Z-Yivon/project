@@ -210,7 +210,7 @@ n = 0x8542D69E4C044F18E8B92435BF6FF7DD297720630485628D5AE74EE7C32E79B7
 
 其中从上到下每行的意义是：私钥，生成的k，原始消息，签名值r，签名值s，验证结果。
 
-![img]([./result.png](https://github.com/Z-Yivon/project/blob/main/project11/result.png))
+![img](https://github.com/Z-Yivon/project/blob/main/project11/result.png)
 
 
 
