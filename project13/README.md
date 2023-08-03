@@ -41,7 +41,7 @@ def combine(msg_set):
 
 ## 实验结果
 
-!([./ScreenShot/ECMH.png](https://github.com/Z-Yivon/project/blob/main/project13/result.png)https://github.com/Z-Yivon/project/blob/main/project13/result.png)
+![img](https://github.com/Z-Yivon/project/blob/main/project13/result.png)
 
 ## 参考文献
 https://eprint.iacr.org/2009/226.pdf
