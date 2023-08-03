@@ -160,7 +160,7 @@ def deterministic_generate_k(msghash, sk):
 
 得到k后，正常的构建sm2签名体系。
 
-![image-20220731000011242](./algorithm.png)
+![./algorithm.png](https://github.com/Z-Yivon/project/blob/main/project11/algorithm.png))
 
 算法流程参考上图：
 
