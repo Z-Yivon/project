@@ -17,7 +17,7 @@ PGP是个混合加密算法，它由一个对称加密算法、一个非对称�
 解密时先使用SM2解密求得会话密钥，再通过SM4和会话密钥求解原消息。
 
 ## 加密过程
-[[image](https://github.com/Z-Yivon/project/blob/main/project14/p2.png)
+![image](https://github.com/Z-Yivon/project/blob/main/project14/p2.png)
 
 ## 解密过程
 ![image](https://github.com/Z-Yivon/project/blob/main/project14/p1.png)
