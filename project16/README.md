@@ -1,6 +1,10 @@
-### Project: implement sm2 2P decrypt with real network communication
+# Project: implement sm2 2P decrypt with real network communication
 
-#### 代码说明
+## 实验环境
+
+python 3.10，需要安装re、random、gmssl、crypto、hashlib、socket等库。
+
+## 代码说明
 
 使用socket网络编程实现真实网络交互下的两方解密。
 
@@ -90,16 +94,12 @@ def decrypt(sock, addr):
 
 ------
 
-#### 运行结果
+## 运行结果
 
-输出最终解密结果。
-
-![image-20220725212236542](./B.png)
-
-![image-20220725212216381](./A.png)
+![img](https://github.com/Z-Yivon/project/blob/main/project16/result.png)
 
 #### 运行指导
 
-先运行UserB.py，监听特定端口并做出回应。
+先运行16client.py，监听特定端口并做出回应。
 
-然后运行UserA.py即可。在UserA的终端会打印输出签名值，UserB无回显。
+然后运行16sever.py即可。在UserA的终端会打印输出签名值。
