@@ -21,7 +21,3 @@ Schnorr_sv.py、leaking_k.py、reusing_k.py、same_dk_withECDSA.py 已经设置�
 ### 运行结果
 
 
-
-### 具体贡献
-
-完成了对部分pitfall的证明。
