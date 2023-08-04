@@ -1,6 +1,10 @@
 # Project21: Schnorr Bacth
 
-## 1、Schnorr数字签名算法简单流程
+## 运行环境
+
+python 3.10 
+
+## Schnorr数字签名算法简单流程
 
 Setup:   
 
@@ -36,7 +40,7 @@ def verify(msg,pk,R,sig):
 
 
 
-### 2、schnorr batch verify
+## schnorr batch verify
 
 ![](https://img1.imgtp.com/2023/07/11/xHFxjOpY.png)
 
@@ -67,6 +71,6 @@ def schnorr_batch(msg_list,pk_list,R_list,sig_list):
 
 代码运行结果：
 
-![](https://img1.imgtp.com/2023/07/11/pav6LwRA.png)
+![](https://github.com/Z-Yivon/project/blob/main/project21/result.png)
 
-可见通过batch同时验证签名所用时间减少了50%左右
+可见通过batch同时验证签名所用时间减少很多。
