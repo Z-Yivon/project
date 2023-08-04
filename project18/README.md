@@ -1,4 +1,4 @@
-## Project: send a tx on Bitcoin testnet, and parse the tx data down to every bit, better write script yourself
+# Project18: send a tx on Bitcoin testnet, and parse the tx data down to every bit, better write script yourself
 
 ### 项目说明
 
@@ -14,7 +14,7 @@
 
 **注：下面涉及到的网站都需要通过代理访问，如果无法访问请使用VPN代理。**
 
-#### 发布交易
+## 发布交易
 
 首先介绍如何申请比特币并在testnet上发布交易。
 
@@ -181,7 +181,7 @@
 }
 ```
 
-#### 交易解析
+## 交易解析
 
 下面编写程序进行解析。
 
