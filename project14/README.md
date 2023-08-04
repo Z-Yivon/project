@@ -17,10 +17,10 @@ PGP是个混合加密算法，它由一个对称加密算法、一个非对称�
 解密时先使用SM2解密求得会话密钥，再通过SM4和会话密钥求解原消息。
 
 ## 加密过程
-![[image](https://user-images.githubusercontent.com/105578152/180976048-bc82649d-e801-4a28-a5c2-3a340b11e63f.png)](https://github.com/Z-Yivon/project/blob/main/project14/p2.png)
+![image](https://github.com/Z-Yivon/project/blob/main/project14/p2.png)
 
 ## 解密过程
-![[image](https://user-images.githubusercontent.com/105578152/180976114-0d3a1d28-5c1b-4034-ad68-6da4d6779308.png)](https://github.com/Z-Yivon/project/blob/main/project14/p1.png)
+![image](https://github.com/Z-Yivon/project/blob/main/project14/p1.png)
 
 # 部分代码说明
 ## def epoint_mod(a, n)

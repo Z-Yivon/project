@@ -1,21 +1,20 @@
-## Project15: implement sm2 2P sign with real network communication
+# Project15: implement sm2 2P sign with real network communication
 
 
 
 
-<<<<<<< HEAD
 该项目使用 python 的 socket 网络编程模拟实际网络，实现了下图的 SM2 签名流程，使用的曲线如下。
 =======
-# 实验环境
+## 实验环境
 
 python 3.10
 
-# PGP简介
+## PGP简介
 PGP(Pretty Good Privacy)，是一个基于RSA公钥和对称加密相结合的邮件加密软件。该系统能为电子邮件和文件存储应用过程提供认证业务和保密业务。
 
 PGP是个混合加密算法，它由一个对称加密算法、一个非对称加密算法、与单向散列算法以及一个随机数产生器（从用户击键频率产生伪随机数序列的种子）组成。
 
-# 实验过程
+## 实验过程
 本次实验旨在实现一个简易PGP，调用GMSSL库中封装好的SM2/SM4加解密函数。
 
 加密时使用对称加密算法SM4加密消息，非对称加密算法SM2加密会话密钥；
@@ -60,8 +59,7 @@ n = 0xFFFFFFFEFFFFFFFFFFFFFFFFFFFFFFFF7203DF6B21C6052B53BBF40939D54123
 G = 0x32c4ae2c1f1981195f9904466a39c9948fe30bbff2660be1715a4589334c74c7, 0xbc3736a2f4f6779c59bdcee36b692153d0a9877cc62a474002df32e52139f0a0
 ```
 
-![pic](./ScreenShot/SM2_sign_PPT.png)
 
 结果如图，实现双方交互，并成功签名：
 
-![pic](./ScreenShot/SM2_sign.png)
+![pic](https://github.com/Z-Yivon/project/blob/main/project15/result.png)
