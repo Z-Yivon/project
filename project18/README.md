@@ -2,9 +2,11 @@
 
 ## 交易信息
 
-打开一个比特币交易网站：https://blockchair.com/bitcoin-cash/block/804701，如下图所示：
+打开一个比特币交易网站：https://blockchair.com/bitcoin-cash/block/804701
 
-![img](F:\创新创业实践\比特币交易\pic\1.png)
+找到一次交易信息，如下图所示：
+
+!([img](https://github.com/Z-Yivon/project/blob/main/project18/p1.png))
 
 可以看到以下信息：
 
