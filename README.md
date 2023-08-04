@@ -14,7 +14,6 @@
 
 已完成：
 
-✅ Project: Implement **Merkle Tree**.
 
 ✅Project1: implement the naïve birthday attack of reduced SM3
 
