@@ -1,8 +1,6 @@
-## Schnorr Batch
+# Project21: Schnorr Bacth
 
-项目完成人： 王庆华
-
-### 1、Schnorr数字签名算法简单流程
+## 1、Schnorr数字签名算法简单流程
 
 Setup:   
 
