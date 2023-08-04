@@ -2,7 +2,7 @@
 
 ------
 
-| Project completer |  student ID  |            Github account name            |
+| 组员 |  学号  |            项目地址           |
 | :---------------: | :----------: | :---------------------------------------: |
 |       周宇帆      | 202100460108 | https://github.com/Z-Yivon/project |
 
