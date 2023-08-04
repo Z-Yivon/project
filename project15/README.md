@@ -9,6 +9,7 @@
 
 python 3.10
 
+先运行server.py文件，再运行client.py文件。
 ## PGP简介
 PGP(Pretty Good Privacy)，是一个基于RSA公钥和对称加密相结合的邮件加密软件。该系统能为电子邮件和文件存储应用过程提供认证业务和保密业务。
 
