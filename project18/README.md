@@ -6,7 +6,7 @@
 
 找到一次交易信息，如下图所示：
 
-!([img](https://github.com/Z-Yivon/project/blob/main/project18/p1.png))
+![img](https://github.com/Z-Yivon/project/blob/main/project18/p1.png)
 
 可以看到以下信息：
 
