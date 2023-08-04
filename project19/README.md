@@ -6,7 +6,7 @@
 
 首先实现ECDSA签名及其验证过程。
 
-![(./algorithm.png)](https://github.com/Z-Yivon/project/blob/main/project19/result.png)
+![[(./algorithm.png)](https://github.com/Z-Yivon/project/blob/main/project19/result.png)](https://github.com/Z-Yivon/project/blob/main/project19/algorithm.png)
 
 由于项目场景的需求，验签算法不检查消息明文m而是直接使用其hash值e。具体流程见上图：
 
