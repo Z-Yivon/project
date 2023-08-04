@@ -25,6 +25,8 @@
 
 ✅Project5: Impl Merkle Tree following RFC6962
 
+✅Project9: AES / SM4 software implementation
+
 ✅Project11: impl sm2 with RFC6979
 
 ✅Project12: verify the above pitfalls with proof-of-concept code
@@ -57,6 +59,6 @@
 
 *Project8: AES impl with ARM instruction
 
-*Project9: AES / SM4 software implementation
+
 
 
