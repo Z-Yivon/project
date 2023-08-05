@@ -8,7 +8,26 @@ leaking_k.py ：完成了对pitfall1：leaking k leads to leaking of d的验证�
 
 reusing_k.py ：完成了对pitfall2：reusing k leads to leaking of d的验证；需要 import：EC、ECDSA_sv
 
+# Leaking K
 
+## 代码说明
+
+当k的值被泄露时，攻击者可以根据公式
+$$
+\begin{array}{l}
+s=(h+r d) k^{-1} \bmod n \\
+d=(s k-h) r^{-1} \bmod n
+\end{array}
+$$
+得到私钥值
+# reusing k
+
+## 代码描述
+
+如果同一个人使用了两次同一个k那么私钥可以被计算得到
+$$
+k=\left(h_{1}-h_{2}\right)\left(s_{1}-s_{2}\right)^{-1} \bmod n
+$$
 
 
 ### 运行指导
