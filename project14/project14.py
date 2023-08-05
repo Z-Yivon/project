@@ -72,7 +72,7 @@ def key_generation(a, p, n, G):
     # 私钥sk
     sk = random.randint(1, n - 2)
     # 公钥pk
-    pk = epoint_mult(d, G, a, p)
+    pk = epoint_mult(sk, G, a, p)
     return sk, pk
 
 
